@@ -1,14 +1,16 @@
 const commModel = require('../../db/models/comm')
+const postModel = require('../../db/models/post')
 
-
+const admin = "61a7391ff1fa8a686b1641c5";
 
 const newComm = (req, res) => {
-    const {postid,dosc,userid} = req.body;
+    const {dosc} = req.body;
+    const {postid,userid} = req.params
 
     const newComm = new postModel({
-      dosc: dosc,
+      dosc,
       postid,
-        userid,
+      userid,
     });
     newComm
     .save()
@@ -21,28 +23,55 @@ const newComm = (req, res) => {
     })
 }
 const allComm = (req, res) => {
+  const {_id} = req.params
+
     commModel
-      .find({})
+      .findOne({_id: _id})
       .then((result) => {
-        res.send(result);
+        res.status(200).json(result);
       })
       .catch((err) => {
-        res.send(err);
+        res.status(400).send(err);
       });
   };
   const deltComm = (req, res) => {
     commModel
-    .find({})
-    .then((result) => {
-    console.log(result);
-    result.filter(item=>{
-      if(item.isdel == true) 
-      res.status(200).json(item);
-    })
-    .catch((err) => {
-      res.status(400).json(err);
-    })
-    })
+    .findOne({ _id: _id })
+    .then((item) => {
+      if (item) {
+        if (item.user == req.token._id) {
+          commModel
+            .findOneAndDelete({ _id: _id })
+            .then((result) => {
+              if (result) {
+                res.status(200).json(result);
+              } else {
+                res.status(404).send("404 not found");
+              }
+            })
+            .catch((err) => {
+              res.status(400).json(err);
+            });
+        } else if (req.token.role == admin ) {
+          commModel
+            .findOneAndDelete({ _id: _id })
+            .then((result) => {
+              if (result) {
+                res.status(200).json(result);
+              } else {
+                res.status(404).send("404 not found");
+              }
+            })
+            .catch((err) => {
+              res.status(400).json(err);
+            });
+        } else {
+          res.status(403).send("forbidden");
+        }
+      } else {
+        res.status(404).send("404 not found");
+      }
+    });
   }
   const getCommById = (req, res) => {
     const { id } = req.params;
@@ -71,17 +100,40 @@ const deletedComm = (req, res) => {
   });
 };
 const updateComm = (req, res) => {
-  const { id } = req.params;
+  const { _id } = req.params;
   const {dosc} = req.body
-  console.log(id);
+  // console.log(id);
   commModel
-  .findByIdAndUpdate(id,{ dosc }).exec()
-  .then((result) => {
-      console.log(result);
-      res.status(200).json(result);
-  })
-  .catch((err) => {
-    res.status(400).json(err);
+  .findOne({ _id: _id })
+  .then((item) => {
+    // console.log(req.token);
+    if (item.user == req.token._id) {
+      commModel
+        .findOneAndUpdate(
+          { _id: _id },
+        )
+        .then((result) => {
+          if (result) {
+            res.status(200).json(result);
+          } else {
+            res.status(404).send("404 not found");
+          }
+        });
+    } else if (req.token.role == admin ) {
+      commModel
+        .findOneAndUpdate(
+          { _id: _id },
+        )
+        .then((result) => {
+          if (result) {
+            res.status(200).json(result);
+          } else {
+            res.status(404).send("not found");
+          }
+        });
+    } else {
+      res.status(404).send("forbidden");
+    }
   });
 };
 module.exports = {

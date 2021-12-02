@@ -3,12 +3,13 @@ const postModel = require('../../db/models/post')
 
 
 const newPost = (req, res) => {
-    const {dosc,img,userid} = req.body;
+  const {_id} = req.params
+    const {dosc,img} = req.body;
 
     const newPost = new postModel({
       dosc: dosc,
       img:img,
-        userid,
+        
     });
     newPost
     .save()
@@ -31,9 +32,11 @@ const allPosts = (req, res) => {
       });
   };
   const deltPost = (req, res) => {
+    const {_id}= req.params
     postModel
-    .find({})
+    .findOne({_id})
     .then((result) => {
+      
     console.log(result);
     result.filter(item=>{
       if(item.isdel == true) 
