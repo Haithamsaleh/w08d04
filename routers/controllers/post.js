@@ -48,10 +48,10 @@ const allPosts = (req, res) => {
     })
   }
   const getPostById = (req, res) => {
-    const { id } = req.params;
-    console.log(id);
+    const { _id } = req.params;
+    console.log(_id);
     postModel
-    .findById(id).exec()
+    .findOne(_id).exec()
     .then((result) => {
       res.status(200).json(result);
     })
@@ -64,7 +64,7 @@ const deletedPost = (req, res) => {
   
   console.log(id);
   postModel
-  .findByIdAndUpdate(id,{ isDel: true }).exec()
+  .findByIdAndUpdate(id,{ isdel: true }).exec()
   .then((result) => {
       console.log(result);
       res.status(200).json(result);
@@ -73,13 +73,12 @@ const deletedPost = (req, res) => {
     res.status(400).json(err);
   });
 };
+
 const updatePost = (req, res) => {
+  const { dosc } = req.body;
   const { id } = req.params;
-  const {dosc} = req.body
-  const {img} = req.body
-  console.log(id);
   postModel
-  .findByIdAndUpdate(id,{ dosc }).exec()
+    .findByIdAndUpdate(id, { $set: { dosc: dosc } })
   .then((result) => {
       console.log(result);
       res.status(200).json(result);
@@ -88,6 +87,9 @@ const updatePost = (req, res) => {
     res.status(400).json(err);
   });
 };
+
+
+
 module.exports = {
   newPost,
   allPosts,

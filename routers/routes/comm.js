@@ -9,11 +9,10 @@ const{
 } = require("./../controllers/comm")
 const commRouter = express.Router();
 
-commRouter.post("/comm", newComm);
+commRouter.post("/comm/:userId/:postId", newComm);
 commRouter.get("/comm/:id", getCommById);
-
 commRouter.get("/comms", allComm);
-commRouter.get("/delcomm", deltComm);
-commRouter.delete("/delete/:id", deletedComm);
+commRouter.put("/delcomm/:id", deltComm);
+commRouter.delete("/deletecomm/:_id", deletedComm);
 commRouter.put("/comm/:id", updateComm);
 module.exports = commRouter;
