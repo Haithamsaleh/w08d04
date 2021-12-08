@@ -1,7 +1,5 @@
-<<<<<<< HEAD
-# w08d04
 
-![This is an image](./84.png)
+
 =======
 # social media backend
 
@@ -19,4 +17,7 @@ install:
 I-Clone git clone https://github.com/Haithamsaleh/w08d02.git 
 II-for node_modules "npm i"
 >>>>>>> a1f22406037d0fb10c630fb0f01c100f38d5824c
+
+![This is an image](./841.svg)
+========================
 ![This is an image](./84.png)
