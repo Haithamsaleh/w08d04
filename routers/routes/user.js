@@ -6,7 +6,7 @@ const authorizathion = require('./../middlewares/authorizathion')
 const {resgister,getUsers,login, deletuser} = require('../controllers/user')
 
 userRouter.post('/resgister',resgister);
-userRouter.get('/users',authentication,authorizathion,getUsers);
+userRouter.get('/users',getUsers);
 userRouter.post('/login',login);
 userRouter.put('/deluser/:id',authentication,authorizathion,deletuser);
 
