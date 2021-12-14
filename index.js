@@ -18,6 +18,8 @@ const postRouter = require("./routers/routes/post")
 app.use(postRouter);
 const commRouter = require("./routers/routes/comm")
 app.use(commRouter);
+// const likeRouter = require('./routers/routes/like');
+// app.use(likeRouter);
 
 
 
