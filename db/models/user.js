@@ -10,7 +10,6 @@ const user = new mongoose.Schema({
   role: { type: mongoose.Schema.Types.ObjectId, ref: "Role",default:"61a73960f1fa8a686b1641c7" },
   passwordCode: {type: String},
   activeCode: {type: String},
-  active: {type: String },
 
 });
 

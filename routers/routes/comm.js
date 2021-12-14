@@ -11,7 +11,7 @@ const{
 } = require("./../controllers/comm")
 const commRouter = express.Router();
 
-commRouter.post("/comm/:userId/:postId",authentication, newComm);
+commRouter.post("/comm/:userId/:postId", newComm);
 commRouter.get("/comm/:id", authentication,getCommById);
 commRouter.get("/comms",authentication,authorizathion, allComm);
 commRouter.put("/delcomm/:id",authentication,authorizathion, deltComm);

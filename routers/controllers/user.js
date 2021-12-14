@@ -16,7 +16,7 @@ const resgister =async (req, res) =>{
     const { username,email ,isdel ,password, role} = req.body;
     const lowerEmail = email.toLowerCase();
     const savedPassword = await bcrypt.hash(password, SALT);
-    let activeCode = "";
+    let activeCode ="";
     const characters = "0123456789";
     for (let i = 0; i < 4; i++) {
       activeCode += characters.charAt(
@@ -71,6 +71,70 @@ const verifyAccount = async (req, res) => {
     res.status(400).json("Wrong code..");
   }
 };
+const checkEmail = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await userModel.findOne({ email });
+
+  if (user) {
+    let passwordCode = "";
+    const characters = "0123456789";
+    for (let i = 0; i < 4; i++) {
+      passwordCode += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+
+    userModel
+      .findByIdAndUpdate(user._id, { passwordCode }, { new: true })
+      .then((result) => {
+        transport
+          .sendMail({
+            from: process.env.EMAIL,
+            to: result.email,
+            subject: "Reset Your Password",
+            html: `<h1>Reset Your Password</h1>
+              <h2>Hi! ${result.username}</h2>
+              <h4>CODE: ${passwordCode}</h4>
+              <p>Please enter the code on the following link and reset your password</p>
+              <a href=https://social-media-project-frontend.herokuapp.com/reset_password/${result._id}> Click here</a>
+              </div>`,
+          })
+          .catch((err) => console.log(err));
+        res.status(200).json(result);
+      })
+      .catch((error) => {
+        res.status(400).json(error);
+      });
+  } else {
+    res.status(400).json("No user with this email");
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { id, code, password } = req.body;
+
+  const user = await userModel.findOne({ _id: id });
+
+  if (user.passwordCode == code) {
+    const hashedPassword = await bcrypt.hash(password, SALT);
+
+    userModel
+      .findByIdAndUpdate(
+        id,
+        { password: hashedPassword, passwordCode: "" },
+        { new: true }
+      )
+      .then((result) => {
+        res.status(200).json(result);
+      })
+      .catch((error) => {
+        res.status(400).json(error);
+      });
+  } else {
+    res.status(400).json("Wrong Code...");
+  }
+};
 
 
 
@@ -96,24 +160,28 @@ const getUsers = (req, res) => {
       if (result) {
 
         if ((result.username == username 
-          || result.email == email)) {
-          const savedPassword = await bcrypt.compare(password, result.password);
-          
-          if (savedPassword) {
+          || result.email == email))
+           {
             const payload = {
               role: result.role,
               id: result._id,
-            username: result.username,
-            email: result.email,
-            }
-            options={
-              expiresIn:"60m"
-          }
+            };
+
+
+          const savedPassword = await bcrypt.compare
+           (password, result.password);
+          
+          if (savedPassword) {
+            if (result.state == "Active") {
+              const options = {
+                expiresIn: "60m",
+              };
           let token = jwt.sign(payload, SECRET_KEY, options);
-          // req.token = token
-          // console.log(req.token);
-            res.status(200).json({ result, token });
-          } else {
+           
+          res.status(200).json({ result, token });
+        } else { res.status(400).json("please Active your account");} 
+
+        } else {
             res.status(400).json("wrong name or password");
           }
         } else {
@@ -145,4 +213,4 @@ const getUsers = (req, res) => {
 };
 
 
-module.exports ={resgister,getUsers,login,deletuser,verifyAccount}
+module.exports ={resgister,getUsers,login,deletuser,verifyAccount,resetPassword,checkEmail}
